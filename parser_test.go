@@ -36,12 +36,3 @@ func TestGet(t *testing.T) {
 		t.Errorf("got %v want %v", got, want)
 	}
 }
-func TestToString(t *testing.T) {
-	got := ToString(map[string]map[string]string{"owner": {"name": "JohnDoe", "organization": "AcmeWidgetsInc."}, "database": {"server": "192.0.2.62", "port": "143", "file": "\"payroll.dat\" "}})
-
-	want := "[owner] name = JohnDoe organization = AcmeWidgetsInc. [database] server = 192.0.2.62 port = 143 file = \"payroll.dat\" "
-
-	if got != want {
-		t.Errorf("got %v want %v", got, want)
-	}
-}
