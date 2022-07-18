@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"fmt"
+
 	"io/ioutil"
 	"strings"
 )
@@ -10,14 +10,14 @@ import (
 var file = ""
 var myList = []string{}
 
-func LoadFromFile(filepath string) {
+func LoadFromFile(filepath string) error {
 	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		fmt.Println("File reading error", err)
-		return
+		return err
 	}
 	file = string(data)
 	myList = strings.Fields(file)
+	return nil
 }
 
 func LoadFromString(inputFile string) {

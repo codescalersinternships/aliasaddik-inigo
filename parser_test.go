@@ -6,6 +6,7 @@ import (
 )
 
 func TestGetSects(t *testing.T) {
+	LoadFromFile("C:/Users/Lolas/OneDrive/Desktop/example.ini")
 	got, _ := GetSectionNames()
 
 	want := []string{"owner", "database"}
@@ -16,7 +17,7 @@ func TestGetSects(t *testing.T) {
 }
 
 func TestGetSections(t *testing.T) {
-
+	LoadFromFile("C:/Users/Lolas/OneDrive/Desktop/example.ini")
 	got, _ := GetSections()
 
 	want := map[string]map[string]string{"owner": {"name": "JohnDoe", "organization": "AcmeWidgetsInc."}, "database": {"server": "192.0.2.62", "port": "143", "file": "\"payroll.dat\""}}
@@ -26,7 +27,7 @@ func TestGetSections(t *testing.T) {
 	}
 }
 func TestGet(t *testing.T) {
-
+	LoadFromFile("C:/Users/Lolas/OneDrive/Desktop/example.ini")
 	got, _ := Get("database", "port")
 
 	want := "143"
