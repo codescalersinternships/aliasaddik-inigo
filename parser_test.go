@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetSects(t *testing.T) {
-	LoadFromFile("C:/Users/Lolas/OneDrive/Desktop/example.ini")
+	main()
 	got, _ := GetSectionNames()
 
 	want := []string{"owner", "database"}
