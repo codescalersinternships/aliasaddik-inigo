@@ -6,6 +6,7 @@ import (
 )
 
 func TestGetSects(t *testing.T) {
+	main()
 	got, _ := GetSectionNames()
 
 	want := []string{"owner", "database"}
