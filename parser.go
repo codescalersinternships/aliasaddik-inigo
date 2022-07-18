@@ -104,3 +104,7 @@ func SaveToFile(filepath string) {
 	dataBytes := []byte(file)
 	ioutil.WriteFile(filepath, dataBytes, 0)
 }
+func main() {
+	LoadFromFile("testing.ini")
+	SaveToFile("result.ini")
+}

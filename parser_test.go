@@ -16,7 +16,7 @@ func TestGetSects(t *testing.T) {
 }
 
 func TestGetSections(t *testing.T) {
-
+	LoadFromFile("testing.ini")
 	got, _ := GetSections()
 
 	want := map[string]map[string]string{"owner": {"name": "JohnDoe", "organization": "AcmeWidgetsInc."}, "database": {"server": "192.0.2.62", "port": "143", "file": "\"payroll.dat\""}}
