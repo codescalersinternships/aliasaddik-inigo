@@ -1,110 +1,116 @@
-package main
+package inigo
 
 import (
+	"bufio"
 	"errors"
 
 	"io/ioutil"
 	"strings"
 )
 
-var file = ""
-var myList = []string{}
+type parsed struct {
+	ParsedValues map[string]map[string]string
+	file         string
+}
 
-func LoadFromFile(filepath string) error {
+func isSection(line string) bool {
+	return strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]")
+}
+func isKey(line string) bool {
+	return strings.Contains(line, "=")
+}
+
+// alia=\"all=aaa\"
+func (p *parsed) Parse() {
+
+	scanner := bufio.NewScanner(strings.NewReader(p.file))
+	var section string
+	for scanner.Scan() {
+		myLine := strings.Trim(scanner.Text(), " ")
+
+		if isSection(myLine) {
+			section = myLine[1 : len([]rune(myLine))-1]
+			p.ParsedValues[section] = make(map[string]string)
+			continue
+		}
+
+		if isKey(myLine) {
+			s := strings.Split(myLine, "=")
+
+			p.ParsedValues[section][strings.Trim(s[0], " ")] = strings.Trim(s[1], " ")
+
+			continue
+		}
+	}
+}
+
+func (p *parsed) LoadFromFile(filepath string) error {
 	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return err
 	}
-	file = string(data)
-	myList = strings.Fields(file)
+	p.file = string(data)
+	p.Parse()
 	return nil
 }
 
-func LoadFromString(inputFile string) {
-	file = inputFile
-	myList = strings.Fields(file)
+func (p *parsed) LoadFromString(inputFile string) error {
+	p.file = inputFile
+	p.Parse()
+	return nil
 }
 
-func GetSectionNames() ([]string, error) {
-	if file == "" {
+func (p *parsed) GetSectionNames() ([]string, error) {
+	if p.file == "" {
 		return nil, errors.New("there is no file loaded")
 	}
 	res := []string{}
-	for _, item := range myList {
-		if strings.Contains(item, "[") && strings.Contains(item, "]") {
-			res = append(res, item[1:len([]rune(item))-1])
-		}
+	for sect, _ := range p.ParsedValues {
+		res = append(res, sect)
 
 	}
+
 	return res, nil
 
 }
-func GetSections() (map[string]map[string]string, error) {
-	if file == "" {
+func (p *parsed) GetSections() (map[string]map[string]string, error) {
+	if p.file == "" {
 		return nil, errors.New("there is no file loaded")
 	}
-	res := map[string]map[string]string{}
-	for i, item := range myList {
-		if strings.Contains(item, "[") && strings.Contains(item, "]") {
-			i += 1
-			secName := item[1 : len([]rune(item))-1]
-			keysAndVals := map[string]string{}
-			for j := i; j < len(myList); j++ {
-				if strings.Contains(myList[j], "[") && strings.Contains(myList[j], "]") {
-					i = j - 1
-					break
-				}
-				if myList[j] == "=" {
-					keysAndVals[myList[j-1]] = myList[j+1]
 
-				}
-			}
-			res[secName] = keysAndVals
-
-		}
-
-	}
-
-	return res, nil
+	return p.ParsedValues, nil
 }
 
-func Get(section, key string) (string, error) {
-	dict, myError := GetSections()
-	if myError != nil {
-		return "", myError
+func (p *parsed) Get(section, key string) (string, error) {
+
+	value, ok := p.ParsedValues[section][key]
+	if !ok {
+		return "", errors.New("could not find the key or section you were looking for")
 	}
 
-	return dict[section][key], nil
+	return value, nil
 
 }
 
-func Set(section, key, newValue string) error {
-	temp, myError := GetSections()
-	if myError != nil {
-		return myError
-	}
-	temp[section][key] = newValue
-	file = ToString(temp)
+func (p *parsed) Set(section, key, newValue string) error {
+
+	p.ParsedValues[section][key] = newValue
 	return nil
 }
 
-func ToString(dict map[string]map[string]string) string {
+func (p *parsed) ToString() {
 	file := ""
-	for sect, keysAndVals := range dict {
+	for sect, keysAndVals := range p.ParsedValues {
 		file += "[" + sect + "] "
 		for key, value := range keysAndVals {
 			file += key + " = " + value + " "
 		}
 	}
-	return file
+	p.file = file
 
 }
 
-func SaveToFile(filepath string) {
-	dataBytes := []byte(file)
+func (p *parsed) SaveToFile(filepath string) {
+	dataBytes := []byte(p.file)
 	ioutil.WriteFile(filepath, dataBytes, 0)
-}
-func main() {
-	LoadFromFile("testing.ini")
-	SaveToFile("result.ini")
 }

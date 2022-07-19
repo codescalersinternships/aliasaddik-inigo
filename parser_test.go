@@ -1,4 +1,4 @@
-package main
+package inigo
 
 import (
 	"reflect"
@@ -6,8 +6,12 @@ import (
 )
 
 func TestGetSects(t *testing.T) {
-	main()
-	got, _ := GetSectionNames()
+	parser := parsed{}
+	parser.ParsedValues = map[string]map[string]string{}
+	parser.file = ""
+	parser.LoadFromFile("testing.ini")
+
+	got, _ := parser.GetSectionNames()
 
 	want := []string{"owner", "database"}
 
@@ -17,8 +21,12 @@ func TestGetSects(t *testing.T) {
 }
 
 func TestGetSections(t *testing.T) {
-	LoadFromFile("C:/Users/Lolas/OneDrive/Desktop/example.ini")
-	got, _ := GetSections()
+	p := parsed{}
+	p.ParsedValues = map[string]map[string]string{}
+	p.file = ""
+	p.LoadFromFile("testing.ini")
+
+	got, _ := p.GetSections()
 
 	want := map[string]map[string]string{"owner": {"name": "JohnDoe", "organization": "AcmeWidgetsInc."}, "database": {"server": "192.0.2.62", "port": "143", "file": "\"payroll.dat\""}}
 
@@ -27,19 +35,14 @@ func TestGetSections(t *testing.T) {
 	}
 }
 func TestGet(t *testing.T) {
-	LoadFromFile("C:/Users/Lolas/OneDrive/Desktop/example.ini")
-	got, _ := Get("database", "port")
+	p := parsed{}
+	p.ParsedValues = map[string]map[string]string{}
+	p.file = ""
+	p.LoadFromFile("testing.ini")
+
+	got, _ := p.Get("database", "port")
 
 	want := "143"
-
-	if got != want {
-		t.Errorf("got %v want %v", got, want)
-	}
-}
-func TestToString(t *testing.T) {
-	got := ToString(map[string]map[string]string{"owner": {"name": "JohnDoe", "organization": "AcmeWidgetsInc."}, "database": {"server": "192.0.2.62", "port": "143", "file": "\"payroll.dat\" "}})
-
-	want := "[owner] name = JohnDoe organization = AcmeWidgetsInc. [database] server = 192.0.2.62 port = 143 file = \"payroll.dat\" "
 
 	if got != want {
 		t.Errorf("got %v want %v", got, want)
